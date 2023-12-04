@@ -36,12 +36,17 @@ services:
     container_name: kafka1
     depends_on:
       - zoo1
+    deploy:
+      resources:
+        limits:
+          memory: 1G
     ports:
       - "9092:9092"
       - "29092:29092"
     volumes:
       - "kafka1_data:/var/lib/kafka/data"
     environment:
+      KAFKA_HEAP_OPTS: "-Xmx512m -Xms256m -XX:+UseG1GC"
       KAFKA_BROKER_ID: 1
       KAFKA_ZOOKEEPER_CONNECT: "zoo1:2181"
       KAFKA_ADVERTISED_LISTENERS: INTERNAL://kafka1:19092,EXTERNAL://${DOCKER_HOST_IP:-127.0.0.1}:9092,DOCKER://host.docker.internal:29092
