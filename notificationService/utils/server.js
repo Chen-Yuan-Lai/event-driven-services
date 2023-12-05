@@ -10,7 +10,7 @@ export function createServer() {
   const { POSTGRESQL_HOST, POSTGRESQL_USER, POSTGRESQL_DATABASE, POSTGRESQL_PASSWORD, POSTGRESQL_PORT } = process.env;
 
   const ssl = {
-    rejectUnauthorized: true, // Set to false if you want to bypass server certificate validation
+    rejectUnauthorized: false, // Set to false if you want to bypass server certificate validation
   };
 
   const connectionString = `postgresql://${POSTGRESQL_USER}:${POSTGRESQL_PASSWORD}@${POSTGRESQL_HOST}:${POSTGRESQL_PORT}/${POSTGRESQL_DATABASE}`;
