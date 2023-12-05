@@ -71,13 +71,14 @@ services:
   notify-app:
     build: ./notificationService
     ports:
-      - "3000:3000"
+      - "3003:3000"
     environment:
       KAFKA_BROKER: kafka1:19092
     networks:
       - kafka-net
     depends_on:
       - kafka1
+      - zoo1
 networks:
   kafka-net:
     driver: bridge

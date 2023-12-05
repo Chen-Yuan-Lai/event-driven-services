@@ -26,10 +26,11 @@ async function main() {
 
       const issuesInterval = await AlertModels.getIssues(client, actionInterval);
 
+      console.log(triggers, issuesInterval);
       let isFire = false;
       for (let i = 0; i < triggers.length; i++) {
-        if (+triggers[i].trigger_type_id === 10) {
-          if (+issuesInterval.issues_num === 0) isFire = true;
+        if (+triggers[i].trigger_type_id === 1) {
+          if (+issuesInterval.issues_num > 0) isFire = true;
         } else {
           const t = await AlertModels.getIssues(client, triggers[i].time_window);
           if (+t.issues_num > +triggers[i].threshold) isFire = true;

@@ -7,6 +7,15 @@ const brokers = [process.env.KAFKA_BROKER];
 const kafka = new Kafka({
   clientId: 'notification-service',
   brokers,
+  retry: {
+    initialRetryTime: 500, // Initial delay between retries in milliseconds
+    retries: 30, // Maximum number of retries
+    maxRetryTime: 30000, // Maximum delay between retries in milliseconds
+    factor: 2, // Exponential factor by which the retry time will be increased
+    multiplier: 1.5, // Multiplier to calculate retry delay
+    maxInFlightRequests: 1, // Maximum number of in-flight requests during retry
+    retryForever: false, // Whether to retry forever
+  },
 });
 
 const consumer = kafka.consumer({
@@ -25,6 +34,7 @@ export const connectConsumer = async topic => {
 
       // const data = JSON.parse(message.value.toString());
       const data = message.value.toString();
+      console.log(data);
       messageEmitter.emit('message', data);
     },
   });
