@@ -1,6 +1,6 @@
 export const getAlertRule = async (client, ruleId) => {
   const query = {
-    text: `SELECT filter, action_interval FROM alert_rules WHERE id = $1`,
+    text: `SELECT filter, action_interval FROM alert_rules WHERE id = $1 AND delete = false`,
     values: [ruleId],
   };
   const res = await client.query(query);
@@ -10,7 +10,7 @@ export const getAlertRule = async (client, ruleId) => {
 
 export const getTriggers = async (client, ruleId) => {
   const query = {
-    text: `SELECT * FROM triggers WHERE rule_id = $1`,
+    text: `SELECT * FROM triggers WHERE rule_id = $1 AND delete = false`,
     values: [ruleId],
   };
   const res = await client.query(query);
@@ -20,7 +20,7 @@ export const getTriggers = async (client, ruleId) => {
 
 export const getTokens = async (client, ruleId) => {
   const query = {
-    text: `SELECT token FROM channels WHERE rule_id = $1`,
+    text: `SELECT token FROM channels WHERE rule_id = $1 AND delete = false`,
     values: [ruleId],
   };
   const res = await client.query(query);
@@ -28,19 +28,24 @@ export const getTokens = async (client, ruleId) => {
   return tokens;
 };
 
-export const getIssues = async (client, interval = null) => {
+export const getIssues = async (client, projectId, interval = null) => {
   const query = {
     text: `SELECT 
-              COUNT(DISTINCT(e.fingerprints)) AS issues_num,
-              COUNT(DISTINCT(r.ip)) AS users_num
+                COUNT(DISTINCT(e.fingerprints)) AS issues_num,
+                COUNT(DISTINCT(r.ip)) AS users_num
             FROM 
-              events AS e
-            LEFT JOIN request_info as r on r.event_id = e.id
-            ${interval ? `WHERE created_at >= NOW() - $1::INTERVAL` : ''}
+                events AS e
+            LEFT JOIN
+                request_info as r on r.event_id = e.id
+            WHERE 
+                e.project_id = $1
+                AND delete = false
+            ${interval ? `AND e.created_at >= NOW() - $2::INTERVAL` : ''}
             `,
+    values: [projectId],
   };
 
-  if (interval) query.values = [interval];
+  if (interval) query.values.push(interval);
   const res = await client.query(query);
   return res.rows[0];
 };
