@@ -1,9 +1,11 @@
+import 'dotenv/config';
 import { createServer } from './utils/server.js';
 import { disconnectConsumer, connectConsumer } from './utils/kafka.js';
 import sendNotification from './utils/sendNotification.js';
 import * as AlertModels from './utils/checkAlertRules.js';
 
-const PORT = 3003;
+const PORT = process.env.PORT;
+
 async function gracefulShutdown(app) {
   console.log('Graceful shutdown');
 
@@ -20,6 +22,7 @@ async function main() {
   emitter.on('message', async ruleId => {
     const client = await app.pg.connect();
     try {
+      await client.query('BEGIN');
       const { filter, action_interval: actionInterval } = await AlertModels.getAlertRule(client, ruleId);
 
       const triggers = await AlertModels.getTriggers(client, ruleId);
