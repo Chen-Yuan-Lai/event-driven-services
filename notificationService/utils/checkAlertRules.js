@@ -52,8 +52,6 @@ export const getIssues = async (client, projectId, interval = null) => {
     text: queryText,
     values: [projectId],
   };
-
-  if (interval) query.values.push(interval);
   const res = await client.query(query);
   return res.rows[0];
 };
