@@ -47,6 +47,7 @@ export const getIssues = async (client, projectId, interval = null) => {
     `,
     interval
   );
+  console.log(queryText);
   const query = {
     text: queryText,
     values: [projectId],
