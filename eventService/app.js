@@ -78,9 +78,11 @@ async function main() {
         requestInfoRes = await createRequestInfo(client, eventId, requestInfo);
       }
 
+      console.log(codeBlocksRes);
+
       const InsertRes = {
         eventId,
-        codeBlockIds: codeBlocksRes.map(el => el.id),
+        codeBlockIds: Object.keys(codeBlocksRes) === 0 ? codeBlocksRes.map(el => el.id) : null,
         requestInfoRes,
       };
 
