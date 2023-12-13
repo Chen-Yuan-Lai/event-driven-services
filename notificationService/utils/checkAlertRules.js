@@ -31,32 +31,28 @@ export const getTokens = async (client, ruleId) => {
 };
 
 export const getIssues = async (client, projectId, interval = null) => {
-  let queryText = `
-    SELECT 
+  const queryText = format(
+    `SELECT 
       COUNT(DISTINCT(e.fingerprints)) AS issues_num,
       COUNT(DISTINCT(r.ip)) AS users_num
     FROM 
       events AS e
     LEFT JOIN
-      request_info AS r ON r.event_id = e.id
+      request_info as r on r.event_id = e.id
     WHERE 
       e.project_id = $1
       AND e.delete = false
       AND e.status = 'unhandled'
-  `;
-
-  const values = [projectId];
-
-  if (interval) {
-    queryText += ` AND e.created_at >= NOW() - INTERVAL $2`;
-    values.push(interval);
-  }
-
+    ${interval ? `AND e.created_at >= NOW() - %L::INTERVAL` : ''}
+    `,
+    interval
+  );
   const query = {
     text: queryText,
-    values: values,
+    values: [projectId],
   };
 
+  if (interval) query.values.push(interval);
   const res = await client.query(query);
   return res.rows[0];
 };
