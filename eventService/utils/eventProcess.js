@@ -32,6 +32,8 @@ const eventProcessPlugin = fp(async fastify => {
 
     // generate fingerprints
     const fingerprints = genHash(stripedStack.replace(/:[0-9]*:[0-9]*/gm, ''));
+    console.log(stripedStack.replace(/:[0-9]*:[0-9]*/gm, ''));
+    console.log(fingerprints);
 
     const trimData = {
       fingerprints,

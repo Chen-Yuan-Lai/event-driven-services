@@ -39,7 +39,8 @@ export const getIssues = async (client, projectId, interval = null) => {
                 request_info as r on r.event_id = e.id
             WHERE 
                 e.project_id = $1
-                AND delete = false
+                AND e.delete = false
+                AND e.status = 'unhandled'
             ${interval ? `AND e.created_at >= NOW() - $2::INTERVAL` : ''}
             `,
     values: [projectId],
