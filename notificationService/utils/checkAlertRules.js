@@ -1,3 +1,5 @@
+import format from 'pg-format';
+
 export const getAlertRule = async (client, ruleId) => {
   const query = {
     text: `SELECT filter, action_interval FROM alert_rules WHERE id = $1 AND delete = false`,
@@ -29,20 +31,24 @@ export const getTokens = async (client, ruleId) => {
 };
 
 export const getIssues = async (client, projectId, interval = null) => {
+  const queryText = format(
+    `SELECT 
+        COUNT(DISTINCT(e.fingerprints)) AS issues_num,
+        COUNT(DISTINCT(r.ip)) AS users_num
+      FROM 
+        events AS e
+      LEFT JOIN
+        request_info as r on r.event_id = e.id
+      WHERE 
+        e.project_id = $1
+        AND e.delete = false
+        AND e.status = 'unhandled'
+      ${interval ? `AND e.created_at >= NOW() - %L::INTERVAL` : ''}
+      `,
+    interval
+  );
   const query = {
-    text: `SELECT 
-                COUNT(DISTINCT(e.fingerprints)) AS issues_num,
-                COUNT(DISTINCT(r.ip)) AS users_num
-            FROM 
-                events AS e
-            LEFT JOIN
-                request_info as r on r.event_id = e.id
-            WHERE 
-                e.project_id = $1
-                AND e.delete = false
-                AND e.status = 'unhandled'
-            ${interval ? `AND e.created_at >= NOW() - $2::INTERVAL` : ''}
-            `,
+    text: queryText,
     values: [projectId],
   };
 
