@@ -23,11 +23,11 @@ async function main() {
     const client = await app.pg.connect();
     try {
       await client.query('BEGIN');
-      const { filter, action_interval: actionInterval } = await AlertModels.getAlertRule(client, ruleId);
+      const { filter, action_interval: actionInterval, project_id } = await AlertModels.getAlertRule(client, ruleId);
 
       const triggers = await AlertModels.getTriggers(client, ruleId);
 
-      const issuesInterval = await AlertModels.getIssues(client, actionInterval);
+      const issuesInterval = await AlertModels.getIssues(client, project_id, actionInterval);
 
       console.log(triggers, issuesInterval);
       let isFire = false;
