@@ -31,28 +31,32 @@ export const getTokens = async (client, ruleId) => {
 };
 
 export const getIssues = async (client, projectId, interval = null) => {
-  const queryText = format(
-    `SELECT 
-        COUNT(DISTINCT(e.fingerprints)) AS issues_num,
-        COUNT(DISTINCT(r.ip)) AS users_num
-      FROM 
-        events AS e
-      LEFT JOIN
-        request_info as r on r.event_id = e.id
-      WHERE 
-        e.project_id = $1
-        AND e.delete = false
-        AND e.status = 'unhandled'
-      ${interval ? `AND e.created_at >= NOW() - %L::INTERVAL` : ''}
-      `,
-    interval
-  );
+  let queryText = `
+    SELECT 
+      COUNT(DISTINCT(e.fingerprints)) AS issues_num,
+      COUNT(DISTINCT(r.ip)) AS users_num
+    FROM 
+      events AS e
+    LEFT JOIN
+      request_info AS r ON r.event_id = e.id
+    WHERE 
+      e.project_id = $1
+      AND e.delete = false
+      AND e.status = 'unhandled'
+  `;
+
+  const values = [projectId];
+
+  if (interval) {
+    queryText += ` AND e.created_at >= NOW() - INTERVAL $2`;
+    values.push(interval);
+  }
+
   const query = {
     text: queryText,
-    values: [projectId],
+    values: values,
   };
 
-  if (interval) query.values.push(interval);
   const res = await client.query(query);
   return res.rows[0];
 };
