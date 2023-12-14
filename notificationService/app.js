@@ -33,10 +33,10 @@ async function main() {
       let isFire = false;
       for (let i = 0; i < triggers.length; i++) {
         if (+triggers[i].trigger_type_id === 1) {
-          if (+issuesInterval.issues_num > 0) isFire = true;
+          if (issuesInterval.issue.length > 0) isFire = true;
         } else {
-          const t = await AlertModels.getIssues(client, triggers[i].time_window);
-          if (+t.issues_num > +triggers[i].threshold) isFire = true;
+          const t = await AlertModels.getIssues(client, project_id, triggers[i].time_window);
+          if (t.find(el => +el.event_num > +triggers[i].threshold)) isFire = true;
         }
 
         if (filter === 'any') break;

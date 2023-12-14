@@ -33,8 +33,9 @@ export const getTokens = async (client, ruleId) => {
 export const getIssues = async (client, projectId, interval = null) => {
   const queryText = format(
     `SELECT 
-      COUNT(DISTINCT(e.fingerprints)) AS issues_num,
-      COUNT(DISTINCT(r.ip)) AS users_num
+      DISTINCT(e.fingerprints) AS issue,
+      COUNT(DISTINCT(r.ip)) AS users_num,
+      COUNT(DISTINCT(e.id)) AS event_num
     FROM 
       events AS e
     LEFT JOIN
@@ -43,7 +44,9 @@ export const getIssues = async (client, projectId, interval = null) => {
       e.project_id = $1
       AND e.delete = false
       AND e.status = 'unhandled'
-    ${interval ? `AND e.created_at >= NOW() - %L::INTERVAL` : ''}
+      ${interval ? `AND e.created_at >= NOW() - %L::INTERVAL` : ''}
+    GROUP By
+      e.fingerprints
     `,
     interval
   );
@@ -53,7 +56,7 @@ export const getIssues = async (client, projectId, interval = null) => {
     values: [projectId],
   };
   const res = await client.query(query);
-  return res.rows[0];
+  return res.rows;
 };
 
 export const createAlertHistory = async (client, ruleId) => {
