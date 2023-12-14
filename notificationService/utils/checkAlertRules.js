@@ -2,7 +2,7 @@ import format from 'pg-format';
 
 export const getAlertRule = async (client, ruleId) => {
   const query = {
-    text: `SELECT filter, project_id action_interval FROM alert_rules WHERE id = $1 AND delete = false`,
+    text: `SELECT * FROM alert_rules WHERE id = $1 AND delete = false`,
     values: [ruleId],
   };
   const res = await client.query(query);
@@ -50,7 +50,6 @@ export const getIssues = async (client, projectId, interval = null) => {
     `,
     interval
   );
-  console.log(queryText);
   const query = {
     text: queryText,
     values: [projectId],
