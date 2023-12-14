@@ -24,19 +24,19 @@ async function main() {
     try {
       await client.query('BEGIN');
       const alert = await AlertModels.getAlertRule(client, ruleId);
-      console.log(alert);
-      const { filter, action_interval: actionInterval, project_id } = alert;
+      const { filter, action_interval: actionInterval, project_id: projectId } = alert;
+      console.log(alert.project_id, projectId);
 
       const triggers = await AlertModels.getTriggers(client, ruleId);
 
-      const issuesInterval = await AlertModels.getIssues(client, project_id, actionInterval);
+      const issuesInterval = await AlertModels.getIssues(client, +projectId, actionInterval);
       console.log(triggers, issuesInterval);
       let isFire = false;
       for (let i = 0; i < triggers.length; i++) {
         if (+triggers[i].trigger_type_id === 1) {
           if (issuesInterval.issue.length > 0) isFire = true;
         } else {
-          const t = await AlertModels.getIssues(client, project_id, triggers[i].time_window);
+          const t = await AlertModels.getIssues(client, +projectId, triggers[i].time_window);
           if (t.find(el => +el.event_num > +triggers[i].threshold)) isFire = true;
         }
 
