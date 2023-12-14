@@ -35,6 +35,7 @@ async function main() {
           if (issuesInterval.issue.length > 0) isFire = true;
         } else {
           const t = await AlertModels.getIssues(client, project_id, triggers[i].time_window);
+          console.log(client, project_id, triggers[i].time_window);
           console.log(t);
           if (t.find(el => +el.event_num > +triggers[i].threshold)) isFire = true;
         }
