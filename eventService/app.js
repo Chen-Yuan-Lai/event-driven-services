@@ -39,6 +39,7 @@ async function main() {
 
       let codeBlocksRes = {};
       // if source map existed, produce code block
+      console.log(newestMap);
       if (newestMap) {
         const Key = newestMap.file_name;
         const Bucket = process.env.S3_BUCKET_NAME;
