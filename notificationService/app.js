@@ -25,7 +25,6 @@ async function main() {
       await client.query('BEGIN');
       const alert = await AlertModels.getAlertRule(client, ruleId);
       const { filter, action_interval: actionInterval, project_id: projectId } = alert;
-      console.log(alert.project_id, projectId);
 
       const triggers = await AlertModels.getTriggers(client, ruleId);
 
