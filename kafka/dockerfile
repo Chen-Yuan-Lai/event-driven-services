@@ -1,0 +1,6 @@
+FROM confluentinc/cp-kafka:latest
+
+COPY start-kafka.sh /start-kafka.sh
+COPY kafka-healthcheck.sh /usr/local/bin/kafka-healthcheck.sh
+
+CMD [ "bash","/start-kafka.sh" ]
